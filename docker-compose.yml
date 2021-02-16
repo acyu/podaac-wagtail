@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  database:
+    image: mysql/mysql-server:5.7
+    volumes:
+      - ./db-backups:/var/mysql/backups:delegated
+    env_file:
+      - ./.env
+    restart: always
+    environment:
+      - COMPOSE_PROJECT_NAME:"${COMPOSE_PROJECT_NAME}"
+    ports:
+      - "${HOST_MACHINE_DATABASE_HOST_PORT}:3306"
+  web:
+    build: .
+    env_file:
+      - ./.env
+    volumes:
+      - ./:/usr/src/app
+    command: python ./webportal/manage.py runserver 0.0.0.0:8000
+    ports:
+      - "${HOST_MACHINE_HTTP_HOST_PORT}:8000"
+    depends_on:
+      - database
